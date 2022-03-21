@@ -2,11 +2,10 @@ import React, {useState} from "react";
 import { request, gql } from "graphql-request"
 import LastDetection from './LastDetection'
 
-
-
 export default class DetectionAPI extends React.Component{
   constructor(props){
     super(props)
+    //state defaults as the number 0 until graphQL pulls data
     this.state = {
       detectionData: 0,
       year: 0,
@@ -19,7 +18,7 @@ export default class DetectionAPI extends React.Component{
     }
   }
 
-
+  //data pull from graphQL database (will update as page refreshes)
   componentDidMount(){
     //future goal: make entries into changeable variables
     const detectionQuery = gql`
@@ -54,7 +53,6 @@ export default class DetectionAPI extends React.Component{
         const dateIsolate = data.detections.entries[0].timestamp
         //stringTimeStamp = stringified time data
         const stringTimestamp = JSON.stringify(data.detections.entries[0].timestamp)
-       console.log(stringTimestamp)
         const replaceChars = ( 
           dateIsolate
           .replace("Z", "")
@@ -73,37 +71,18 @@ export default class DetectionAPI extends React.Component{
           minute: splitHrMinSec[1],
           second: splitHrMinSec[2],
           hrMinSec: splitChars[3],
+          date: splitChars[1] + "-" + splitChars[2] + "-" + splitChars[0],
+          time: splitHrMinSec[0] + ":" + splitHrMinSec[1] + ":" + splitHrMinSec[1]
         }) 
         })
-
-      console.log(typeof this.state.second, typeof this.state.minute)
       }
 
 
   
   render(variables){
-    const { detectionData, year, month, day, hour, minute, second } = this.state
+    const { detectionData, year, month, day, hour, minute, second, date, time } = this.state
 
     //For double checking date number values
-      /*{console.log(
-        "Year: " + this.state.year +
-        " "
-        +
-        "Month: " + this.state.month +
-        " "
-        +
-        "Day: " + this.state.day +
-        " "
-        +
-        "Hour: " + this.state.hour +
-        " "
-        +
-        "Minute: " + this.state.minute +
-        " "
-        +
-        "Second: " + this.state.second +
-        " "
-        )}*/
   return ( 
   
     <div>
@@ -113,7 +92,7 @@ export default class DetectionAPI extends React.Component{
        <h1>Hour: {hour}</h1>
        <h1>Minute: {minute}</h1>
        <h1>Second: {second}</h1>
-     <LastDetection timestamp={this.state.detectionData} year={year} month={this.state.month} day={this.state.day} hour={this.state.hour}/>
+     <LastDetection date={this.state.date} time={this.state.time} timestamp={this.state.detectionData} year={year} month={this.state.month} day={this.state.day} hour={this.state.hour} minute={this.state.minute} second={this.state.second}/>
     </div>
     ) 
   }
